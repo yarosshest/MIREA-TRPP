@@ -67,10 +67,17 @@ services:
 
 Тут запускаються 2 контейнера bot для бота, postgres для базы данных где выставляеться порт базы данных \par
 
-\section{Развертывание контейнера на скервере}
-Docker Compose был развернут на собственном сервере с помощью 2 команд: \par
+\section{Развертывание контейнера на сервере}
+Docker Compose был развернут на собственном сервере с помощью 3 команд: \par
 \begin{verbatim}
   git pull
   docker-compose build
   docker-compose up
 \end{verbatim}
+
+\begin{figure}[h!tp]
+  \centering
+  \includegraphics[width=0.9\textwidth]{server_run}
+  \caption{Развертывание контейнера на сервере}
+  \label{fig:server:run}
+\end{figure}
