@@ -1,5 +1,4 @@
-%\graphicspath{{/home/arbon/Pictures/Screenshots/}} % path to graphics
-\graphicspath{{~/Documents/SADT/SecondTask/img/}}
+\graphicspath{{./img}}
 \chapter*{\LARGE{Цель практической работы}}
 \addcontentsline{toc}{chapter}{Цель практической работы}
 Данная практическая работа посвящена написанию базовых bash-скриптов.\par
@@ -31,11 +30,12 @@
 	, caption=\leftline{Код скрипта}
 	, label=lst:date]
 #!/bin/sh
-date > "\$1"
-cat /etc/passwd | cut -d':' -f 1 >> "\$1"
-uptime >> "\$1"
-echo "" >> "\$1"
+date > ./$1
+cat /etc/passwd | cut -d':' -f 1 >> ./$1
+uptime >> ./$1
+echo "" >> ./$1
 \end{lstlisting}
+\img{pngb1}{Cценарий 1}
 
 \paragraph{Cценарий, который выводит содержимое любого каталога
 или сообщение о том, что его не существует}\mbox{}\par
@@ -49,13 +49,13 @@ echo "" >> "\$1"
 	, caption=\leftline{Проверка на директорию}
 	, label=lst:chdir]
 #!/bin/sh
-if [ -d "\$1" ]; then
-	ls "\$1"
+if [ -d ./$1 ]; then
+	ls ./$1
 else
 	echo "it is not dir"
 fi
 \end{lstlisting}
-
+\img{pngb2}{Cценарий 2}
 \paragraph{Cценарий, который с помощью цикла прочитает файл и
 выведет его содержимое}\mbox{}\par
 Чтобы построчно прочитать файл использовался цикл \texttt{while} и в качестве
@@ -70,10 +70,10 @@ fi
 #!/bin/sh
 while read line
 do
-	echo "\$line"
-done < "\$1"
+	echo "$line"
+done < $1
 \end{lstlisting}
-
+\img{pngb3}{Cценарий 3}
 \paragraph{Cценарий, который с помощью цикла выведет список
 файлов и директорий из текущего каталога, укажет, что есть файл, а
 что директория}\mbox{}\par
@@ -87,17 +87,17 @@ done < "\$1"
 	, caption=\leftline{Вывод содержимого директории с информацией о файлах}
 	, label=lst:info]
 #!/bin/sh
-ls "\$1" | while read file
+ls ./$1 | while read file
 do
-	echo -n "\$file"
-	if [ -f "\$file" ]; then
+	echo -n ./$file
+	if [ -f ./$file ]; then
 		echo " is a file"
 	else
 		echo " is a dir"
 	fi
 done
 \end{lstlisting}
-
+\img{pngb4}{Cценарий 4}
 \paragraph{Cценарий, который подсчитает объем диска, занимаемого
 директорией}\mbox{}\par
 Скрипт вызывает команду \texttt{du}, передавая ей путь к директории,
@@ -108,9 +108,9 @@ done
 	, caption=\leftline{Вывод объема директории}
 	, label=lst:du]
 #!/bin/sh
-du -sh "\$1"
+du -sh ./$1
 \end{lstlisting}
-
+\img{pngb5}{Cценарий 5}
 \paragraph{Cценарий, который выведет список всех исполняемых
 файлов в директории, для которых у текущего пользователя есть права
 на исполнение}\mbox{}\par
@@ -124,14 +124,14 @@ du -sh "\$1"
 	, caption=\leftline{Проверка на директорию}
 	, label=lst:exec]
 #!/bin/sh
-ls "\$1" | while read file
+ls ./$1 | while read file
 do
-	if [ -x "\$file" ]; then
-		echo "\$file"		
+	if [ -x ./$file ]; then
+		echo "$file"
 	fi
 done;
 \end{lstlisting}
-
+\img{pngb6}{Cценарий 6}
 \clearpage
 
 \section{Развертка и запуск проекта при помощи Bash Script}
@@ -154,29 +154,30 @@ done;
 	, label=lst:req]
 #!/bin/bash
 packs=""
-for file in \$(find "\$1" -type f -regex '.*.py')
+for file in $(find ./$1 -type f -regex '.*.py')
 do
-	packs="\$(grep -e "^import" "\$file" \
-		| cut -d' ' -f 2 | cut -d'.' -f 1) \$packs"
-	packs="\$(grep -e "^from" "\$file" \
-		| cut -d' ' -f 2 | cut -d'.' -f 1) \$packs"
+        pack=$(grep -e '^import' $file | cut -d' ' -f 2 | cut -d'.' -f 1)
+        packs+="$pack"$'\n'
+        pack=$(grep -e '^from' $file | cut -d' ' -f 2 | cut -d'.' -f 1 )
+        packs+="$pack"$'\n'
 done
-packs=\$(echo \$packs | tr ' ' '\n' | sort -u | tail -n +2)
+packs=$(echo $packs | tr ' ' '\n' | sort -u | tail -n +2)
 if [ -f requirements.txt ]; then
-	rm requirements.txt
+        rm requirements.txt
 fi
 touch requirements.txt
-for pack in \$packs
+for pack in $packs
 do
-	if ! grep -qw "\$pack" ./packs_stdlib.txt;
-	then
-		if ! [[ \$(find "\$1" -name "\$pack") ]]
-		then
-			echo \$srpk >> requirements.txt
-		fi
-	fi
+        if ! grep -qw $pack ./packs_stdlib.txt;
+        then
+                if ! [[ $(find ./$1 -name $pack) ]]
+                then
+                        echo $pack >> requirements.txt
+                fi
+        fi
 done
 \end{lstlisting}
+\img{pngb7}{Cценарий 7}
 
 \subsection{Создание виртуального окружения}
 Python позволяет создавать так называемое виртуальное окружение.
@@ -196,21 +197,21 @@ Python позволяет создавать так называемое вир�
 	, label=lst:venv]
 #!/bin/sh
 url='https://www.dropbox.com/s/ija7ax3sj6ysb0p/\
-	blocknote-master.tar.gz'
+        blocknote-master.tar.gz'
 echo -n "Download "
-wget -q \$url
+wget -q $url
 echo "=> done"
 if [ -d blocknote-master ]; then
-	rm -rf blocknote-master
+        rm -rf blocknote-master
 fi
 tar -xf blocknote-master.tar.gz
 rm blocknote-master.tar.gz
-path="./blocknote-master"
-./task7.sh \$path
-python3 -m venv \$path/venv
-\$path/venv/bin/pip install -r requirements.txt
+path="blocknote-master"
+./bash7 $path
+python3 -m venv $path/venv
+$path/venv/bin/pip install -r requirements.txt
 \end{lstlisting}
-
+\img{pngb8}{Cценарий 8}
 \subsection{Скрипт запуска приложения на новой системе}
 Bash-скриптов.скрипты позволяют создать с нуля всё необходимое окружение в
 системе начиная с установки самого python и всего необходимого ПО для
@@ -230,11 +231,11 @@ Bash-скриптов.скрипты позволяют создать с нул
 sudo apt install python3
 wget https://bit.ly/3u7LRU7
 tar -xf *.tar*
-./task7.sh .
+./bash7.sh .
 python3 -m venv venv
 ./venv/bin/pip install -r requirements.txt
 ./venv/bin/python manage.py makemigrations
 ./venv/bin/python manage.py migrate
 ./venv/bin/python manage.py runserver
 \end{lstlisting}
-
+\img{pngb9}{Cценарий 9}
